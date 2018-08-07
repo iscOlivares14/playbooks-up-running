@@ -1,0 +1,27 @@
+- name: Cibfigure webserver with nginx
+  hosts: webservers
+  become: True
+  pre_tasks:
+    - name: check/perform python2 installation
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      register: check_python
+      changed_when: check_python.stdout != ''
+  tasks:
+    - name: install nginx
+      apt: name=nginx update_cache=yes
+
+    - name: copy nginx config file
+      copy: src=files/nginx.conf dest=/etc/nginx/sites-available/default
+
+    - name: enable configuration
+      file: >
+        dest=/etc/nginx/sites-enabled/default
+        src=/etc/nginx/sites-available/default
+        state=link
+
+    - name: copy index.html
+      template: src=templates/index.html.j2 dest=/usr/share/nginx/html/index.html
+        mode=0644
+
+    - name: restart nginx
+      service: name=nginx state=restarted
