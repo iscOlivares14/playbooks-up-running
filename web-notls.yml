@@ -1,6 +1,9 @@
-- name: Cibfigure webserver with nginx
+---
+# Following the instructions for a nginx deployment without TLS
+- name: Configure webserver with nginx
   hosts: webservers
   become: True
+  gather_facts: False
   pre_tasks:
     - name: check/perform python2 installation
       raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
