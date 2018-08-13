@@ -1,4 +1,0 @@
-  HostName 127.0.0.1
-  User vagrant
-  Port 2222
-  IdentityFile /Users/volivares/git/playbooks-up-running/.vagrant/machines/default/virtualbox/private_key

@@ -3,11 +3,17 @@
 - name: Configure webserver with nginx and tls
   hosts: webservers
   become: True
+  gather_facts: False
   vars:
     key_file: /etc/nginx/ssl/nginx.key
     cert_file: /etc/nginx/ssl/nginx.crt
     conf_file: /etc/nginx/sites-available/default
     server_name: localhost
+  pre_tasks:
+    - name: check/perform python2 installation
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      register: check_python
+      changed_when: check_python.stdout != ''
   tasks:
     - name: Install nginx
       apt: name=nginx update_cache=yes cache_valid_time=3600
@@ -24,7 +30,7 @@
       notify: restart nginx
 
     - name: copy nginx config file
-      template: src=template/nginx.conf.j2 dest={{ conf_file }}
+      template: src=templates/nginx.conf.j2 dest={{ conf_file }}
       notify: restart nginx
 
     - name: enable configuration
