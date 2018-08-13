@@ -1,9 +1,10 @@
 ---
 # nginx with TLS active
 - name: Configure webserver with nginx and tls
-  hosts: webservers
+  hosts:
+    - vagrant1
   become: True
-  gather_facts: False
+  gather_facts: True
   vars_files:
     - nginx.yml
   pre_tasks:
@@ -12,6 +13,16 @@
       register: check_python
       changed_when: check_python.stdout != ''
   tasks:
+    - debug: var=ansible_distribution
+    # test task of register
+    - name: capture output of id command
+      command: id -un
+      register: login
+      # ignore_errors: True # to non stop execution of tasks whe fails
+    - debug: var=login
+    - debug: msg="Logged in as user {{ login.stdout }}"
+
+    # real tasks
     - name: Install nginx
       apt: name=nginx update_cache=yes cache_valid_time=3600
 
